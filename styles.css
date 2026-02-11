@@ -107,6 +107,14 @@ body {
     width: 100%;
 }
 
+.nav-link.active {
+    color: var(--accent-color);
+}
+
+.nav-link.active::after {
+    width: 100%;
+}
+
 .hamburger {
     display: none;
     flex-direction: column;
@@ -775,6 +783,38 @@ section {
 .form-group textarea {
     resize: vertical;
     min-height: 150px;
+}
+
+/* Success Message */
+.success-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #00ff88, #00cc77);
+    color: #000;
+    padding: 2rem 3rem;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    z-index: 10000;
+    animation: fadeInUp 0.5s ease;
+    box-shadow: 0 10px 40px rgba(0, 255, 136, 0.3);
+}
+
+.success-message.fade-out {
+    animation: fadeOut 0.5s ease forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+    to {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
 }
 
 /* Footer */

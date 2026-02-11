@@ -29,15 +29,51 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Navbar Background on Scroll
-window.addEventListener('scroll', () => {
-    const navbar = document.querySelector('.navbar');
-    if (window.scrollY > 50) {
+// Consolidated Scroll Handler with throttling
+let scrollTimeout;
+const navbar = document.querySelector('.navbar');
+const hero = document.querySelector('.hero');
+const sections = document.querySelectorAll('section[id]');
+
+function handleScroll() {
+    const scrollY = window.pageYOffset;
+    
+    // Navbar background
+    if (scrollY > 50) {
         navbar.style.background = 'rgba(0, 0, 0, 0.98)';
         navbar.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.5)';
     } else {
         navbar.style.background = 'rgba(0, 0, 0, 0.95)';
         navbar.style.boxShadow = 'none';
+    }
+    
+    // Parallax effect for hero
+    if (hero) {
+        hero.style.transform = `translateY(${scrollY * 0.5}px)`;
+    }
+    
+    // Active navigation highlighting
+    sections.forEach(section => {
+        const sectionHeight = section.offsetHeight;
+        const sectionTop = section.offsetTop - 100;
+        const sectionId = section.getAttribute('id');
+        const navLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
+
+        if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+            navLink?.classList.add('active');
+        } else {
+            navLink?.classList.remove('active');
+        }
+    });
+}
+
+// Throttled scroll event
+window.addEventListener('scroll', () => {
+    if (!scrollTimeout) {
+        scrollTimeout = setTimeout(() => {
+            handleScroll();
+            scrollTimeout = null;
+        }, 10);
     }
 });
 
@@ -64,8 +100,11 @@ const observer = new IntersectionObserver((entries) => {
             // Animate counters
             if (entry.target.classList.contains('stat-item')) {
                 const counter = entry.target.querySelector('.stat-number');
-                const target = parseInt(counter.getAttribute('data-target'));
-                animateCounter(counter, target);
+                if (!counter.dataset.animated) {
+                    const target = parseInt(counter.getAttribute('data-target'));
+                    counter.dataset.animated = 'true';
+                    animateCounter(counter, target);
+                }
             }
         }
     });
@@ -107,21 +146,7 @@ if (contactForm) {
         if (name && email && subject && message) {
             // Create success message
             const successMsg = document.createElement('div');
-            successMsg.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: linear-gradient(135deg, #00ff88, #00cc77);
-                color: #000;
-                padding: 2rem 3rem;
-                border-radius: 10px;
-                font-size: 1.2rem;
-                font-weight: 600;
-                z-index: 10000;
-                animation: fadeInUp 0.5s ease;
-                box-shadow: 0 10px 40px rgba(0, 255, 136, 0.3);
-            `;
+            successMsg.className = 'success-message';
             successMsg.textContent = 'Message sent successfully! ✓';
             document.body.appendChild(successMsg);
             
@@ -130,7 +155,7 @@ if (contactForm) {
             
             // Remove message after 3 seconds
             setTimeout(() => {
-                successMsg.style.animation = 'fadeOut 0.5s ease';
+                successMsg.classList.add('fade-out');
                 setTimeout(() => {
                     document.body.removeChild(successMsg);
                 }, 500);
@@ -138,22 +163,6 @@ if (contactForm) {
         }
     });
 }
-
-// Add fadeOut animation
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fadeOut {
-        from {
-            opacity: 1;
-            transform: translate(-50%, -50%);
-        }
-        to {
-            opacity: 0;
-            transform: translate(-50%, -60%);
-        }
-    }
-`;
-document.head.appendChild(style);
 
 // Typing Effect for Hero Section (optional enhancement)
 const heroSubtitle = document.querySelector('.hero-subtitle');
@@ -174,48 +183,8 @@ if (heroSubtitle) {
     setTimeout(typeWriter, 1000);
 }
 
-// Parallax Effect for Hero Section
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const hero = document.querySelector('.hero');
-    if (hero) {
-        hero.style.transform = `translateY(${scrolled * 0.5}px)`;
-    }
-});
 
-// Active Navigation Link on Scroll
-const sections = document.querySelectorAll('section[id]');
-
-function highlightNavigation() {
-    const scrollY = window.pageYOffset;
-
-    sections.forEach(section => {
-        const sectionHeight = section.offsetHeight;
-        const sectionTop = section.offsetTop - 100;
-        const sectionId = section.getAttribute('id');
-        const navLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
-
-        if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-            navLink?.classList.add('active');
-        } else {
-            navLink?.classList.remove('active');
-        }
-    });
-}
-
-window.addEventListener('scroll', highlightNavigation);
-
-// Add active class styling
-const activeStyle = document.createElement('style');
-activeStyle.textContent = `
-    .nav-link.active {
-        color: var(--accent-color) !important;
-    }
-    .nav-link.active::after {
-        width: 100%;
-    }
-`;
-document.head.appendChild(activeStyle);
+// Active class styling is now consolidated in handleScroll above
 
 // Cursor Effect (optional - adds a custom cursor trail)
 const cursor = document.createElement('div');
@@ -232,10 +201,24 @@ cursor.style.cssText = `
 `;
 document.body.appendChild(cursor);
 
+let cursorX = 0;
+let cursorY = 0;
+let animationFrameId = null;
+
+function updateCursor() {
+    cursor.style.left = cursorX - 10 + 'px';
+    cursor.style.top = cursorY - 10 + 'px';
+    animationFrameId = null;
+}
+
 document.addEventListener('mousemove', (e) => {
     cursor.style.display = 'block';
-    cursor.style.left = e.clientX - 10 + 'px';
-    cursor.style.top = e.clientY - 10 + 'px';
+    cursorX = e.clientX;
+    cursorY = e.clientY;
+    
+    if (!animationFrameId) {
+        animationFrameId = requestAnimationFrame(updateCursor);
+    }
 });
 
 // Scale cursor on clickable elements
@@ -249,15 +232,6 @@ clickables.forEach(el => {
         cursor.style.transform = 'scale(1)';
         cursor.style.borderColor = 'var(--accent-color)';
     });
-});
-
-// Page Load Animation
-window.addEventListener('load', () => {
-    document.body.style.opacity = '0';
-    setTimeout(() => {
-        document.body.style.transition = 'opacity 0.5s ease';
-        document.body.style.opacity = '1';
-    }, 100);
 });
 
 console.log('%c Portfolio Loaded Successfully! ', 'background: #00ff88; color: #000; font-size: 20px; font-weight: bold; padding: 10px;');
