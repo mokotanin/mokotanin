@@ -1,1 +1,1 @@
-!["ok"](https://github.com/mokotanin/mokotanin/blob/564d0471ba54ba9aaeb1b1e204ccbf85dc9cd159/assets/mokotanin.png)
+!["ok"](https://github.com/mokotanin/mokotanin/blob/8dd9235c8d6c3fdb74941d3dbd01f4af776db79d/assets/mokotanin.png)
