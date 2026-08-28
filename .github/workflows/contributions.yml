@@ -28,7 +28,7 @@ jobs:
       - name: Update contribution counter
         env:
           GITHUB_USERNAME: ${{ github.repository_owner }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.G_PAT }}
         run: python scripts/update_contributions.py
 
       - name: Commit changes
