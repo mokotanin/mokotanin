@@ -1,46 +1,27 @@
-name: Update contributions
+name: Update Contributions
 
 on:
   schedule:
     - cron: "0 0 * * *"
-
   workflow_dispatch:
 
 jobs:
   update:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.x"
 
-      - name: Install requests
+      - name: Install dependencies
         run: pip install requests
 
-      - name: Update contribution counter
+      - name: Update contributions
         env:
-          GITHUB_USERNAME: ${{ github.repository_owner }}
+          GITHUB_USERNAME: mokotanin
           GITHUB_TOKEN: ${{ secrets.G_PAT }}
         run: python scripts/update_contributions.py
-
-      - name: Commit changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add README.md
-
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "chore: update contribution counter"
-            git push
-          fi
