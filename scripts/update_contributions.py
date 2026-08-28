@@ -57,13 +57,7 @@ for year in range(2010, 2027):
 print("----------------")
 print(f"TOTAL: {total}")
 
-# Update README Cat Girl Counter
-
-README = "README.md"
-
-with open(README, "r", encoding="utf-8") as f:
-    content = f.read()
-
+# Génère les GIFs correspondant à chaque chiffre
 digits = str(total)
 
 images = "\n".join(
@@ -71,30 +65,21 @@ images = "\n".join(
     for digit in digits
 )
 
-replacement = f"""<!-- CONTRIBUTIONS:START -->
-
+content = f"""<!-- CONTRIBUTIONS:START -->
 <p align="center">
-
 {images}
-
 </p>
-
 <!-- CONTRIBUTIONS:END -->"""
 
-pattern = r"<!-- CONTRIBUTIONS:START -->.*?<!-- CONTRIBUTIONS:END -->"
+with open("README.md", "r", encoding="utf-8") as f:
+    readme = f.read()
 
-new_content, replacements = re.subn(
-    pattern,
-    replacement,
+readme = re.sub(
+    r"<!-- CONTRIBUTIONS:START -->.*?<!-- CONTRIBUTIONS:END -->",
     content,
+    readme,
     flags=re.DOTALL,
 )
 
-if replacements == 0:
-    print("ERROR: CONTRIBUTIONS markers not found in README.")
-    raise SystemExit(1)
-
-with open(README, "w", encoding="utf-8") as f:
-    f.write(new_content)
-
-print(f"Cat Girl Counter updated to {total}.")
+with open("README.md", "w", encoding="utf-8") as f:
+    f.write(readme)
