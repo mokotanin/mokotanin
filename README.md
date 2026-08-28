@@ -2,6 +2,6 @@
 
 <!-- CONTRIBUTIONS:START -->
 <p align="center">
-
+<img src="./counter-images/2.gif" alt="2">
 </p>
 <!-- CONTRIBUTIONS:END -->
