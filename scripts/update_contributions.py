@@ -1,6 +1,5 @@
 import os
 import requests
-from datetime import datetime, timezone
 
 USERNAME = os.environ["GITHUB_USERNAME"]
 TOKEN = os.environ["GITHUB_TOKEN"]
@@ -11,53 +10,48 @@ query($login: String!, $from: DateTime!, $to: DateTime!) {
     contributionsCollection(from: $from, to: $to) {
       contributionCalendar {
         totalContributions
-        weeks {
-          contributionDays {
-            date
-            contributionCount
-          }
-        }
       }
     }
   }
 }
 """
 
-now = datetime.now(timezone.utc)
-
-# GitHub's "last year" calendar starts 1 year ago
-# but we use the calendar dates themselves rather than
-# simply summing API contribution types.
-from_date = now.replace(year=now.year - 1)
-
-variables = {
-    "login": USERNAME,
-    "from": from_date.isoformat(),
-    "to": now.isoformat(),
+headers = {
+    "Authorization": f"Bearer {TOKEN}",
+    "Content-Type": "application/json",
 }
 
-response = requests.post(
-    "https://api.github.com/graphql",
-    headers={
-        "Authorization": f"Bearer {TOKEN}",
-        "Content-Type": "application/json",
-    },
-    json={
-        "query": QUERY,
-        "variables": variables,
-    },
-)
+total = 0
 
-response.raise_for_status()
-data = response.json()
+for year in range(2010, 2027):
+    variables = {
+        "login": USERNAME,
+        "from": f"{year}-01-01T00:00:00Z",
+        "to": f"{year + 1}-01-01T00:00:00Z",
+    }
 
-if "errors" in data:
-    print("GitHub GraphQL error:")
-    print(data["errors"])
-    raise SystemExit(1)
+    response = requests.post(
+        "https://api.github.com/graphql",
+        headers=headers,
+        json={
+            "query": QUERY,
+            "variables": variables,
+        },
+    )
 
-calendar = data["data"]["user"]["contributionsCollection"]["contributionCalendar"]
+    data = response.json()
 
-total = calendar["totalContributions"]
+    if "errors" in data:
+        print(f"{year}: ERROR")
+        print(data["errors"])
+        continue
 
-print(f"All-time contributions: {total}")
+    count = data["data"]["user"]["contributionsCollection"][
+        "contributionCalendar"
+    ]["totalContributions"]
+
+    print(f"{year}: {count}")
+    total += count
+
+print("----------------")
+print(f"TOTAL: {total}")
