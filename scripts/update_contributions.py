@@ -57,27 +57,44 @@ for year in range(2010, 2027):
 print("----------------")
 print(f"TOTAL: {total}")
 
-# ─────────────────────────────────────────
-# Update Cat Girl Counter in README
-# ─────────────────────────────────────────
+# Update README Cat Girl Counter
 
 README = "README.md"
 
 with open(README, "r", encoding="utf-8") as f:
     content = f.read()
 
-pattern = r'(<cat-girl-counter\s+count=")\d+("></cat-girl-counter>)'
+digits = str(total)
+
+images = "\n".join(
+    f'<img src="./counter-images/{digit}.gif" alt="{digit}">'
+    for digit in digits
+)
+
+replacement = f"""<!-- CONTRIBUTIONS:START -->
+
+<p align="center">
+
+{images}
+
+</p>
+
+<!-- CONTRIBUTIONS:END -->"""
+
+pattern = r"<!-- CONTRIBUTIONS:START -->.*?<!-- CONTRIBUTIONS:END -->"
 
 new_content, replacements = re.subn(
     pattern,
-    rf"\g<1>{total}\g<2>",
+    replacement,
     content,
+    flags=re.DOTALL,
 )
 
 if replacements == 0:
-    print("Cat Girl Counter not found in README.")
-else:
-    with open(README, "w", encoding="utf-8") as f:
-        f.write(new_content)
+    print("ERROR: CONTRIBUTIONS markers not found in README.")
+    raise SystemExit(1)
 
-    print(f"Cat Girl Counter updated to {total}.")
+with open(README, "w", encoding="utf-8") as f:
+    f.write(new_content)
+
+print(f"Cat Girl Counter updated to {total}.")
