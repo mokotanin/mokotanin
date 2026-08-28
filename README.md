@@ -2,6 +2,8 @@
 
 <!-- CONTRIBUTIONS:START -->
 <p align="center">
-<img src="./counter-images/0.gif">
+<img src="./counter-images/2.gif" alt="2">
+<img src="./counter-images/4.gif" alt="4">
+<img src="./counter-images/1.gif" alt="1">
 </p>
 <!-- CONTRIBUTIONS:END -->
