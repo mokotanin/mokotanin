@@ -26,7 +26,6 @@ headers = {
 total = 0
 current_year = datetime.now().year
 
-# GitHub a été lancé en 2008
 for year in range(2008, current_year + 1):
     variables = {
         "login": USERNAME,
@@ -56,7 +55,6 @@ for year in range(2008, current_year + 1):
 
 print(f"All-time contributions: {total}")
 
-# Génère les GIFs correspondant à chaque chiffre
 digits = str(total)
 
 images = "\n".join(
