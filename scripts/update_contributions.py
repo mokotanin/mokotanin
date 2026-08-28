@@ -13,7 +13,6 @@ headers = {
 }
 
 def graphql_request(query, variables):
-    """Fait une requête GraphQL et gère les erreurs."""
     response = requests.post(
         "https://api.github.com/graphql",
         json={"query": query, "variables": variables},
@@ -25,37 +24,44 @@ def graphql_request(query, variables):
         raise RuntimeError(data["errors"])
     return data["data"]
 
-# --- 1. Récupérer tous les dépôts où vous avez commité ---
-repo_query = """
-query($login: String!, $from: DateTime!, $to: DateTime!) {
-  user(login: $login) {
-    contributionsCollection(from: $from, to: $to) {
-      commitContributionsByRepository(maxRepositories: 100) {
-        repository {
-          name
-          owner { login }
+# --- 1. Récupérer tous les dépôts où vous avez commité, en itérant par année ---
+current_year = datetime.now().year
+start_year = 2008  # année de création de GitHub
+
+repo_set = set()
+
+for year in range(start_year, current_year + 1):
+    from_date = f"{year}-01-01T00:00:00Z"
+    to_date = f"{year}-12-31T23:59:59Z"
+    
+    repo_query = """
+    query($login: String!, $from: DateTime!, $to: DateTime!) {
+      user(login: $login) {
+        contributionsCollection(from: $from, to: $to) {
+          commitContributionsByRepository(maxRepositories: 100) {
+            repository {
+              name
+              owner { login }
+            }
+          }
         }
       }
     }
-  }
-}
-"""
+    """
+    
+    try:
+        data = graphql_request(repo_query, {
+            "login": USERNAME,
+            "from": from_date,
+            "to": to_date,
+        })
+        for entry in data["user"]["contributionsCollection"]["commitContributionsByRepository"]:
+            repo = entry["repository"]
+            repo_set.add(f"{repo['owner']['login']}/{repo['name']}")
+    except Exception as e:
+        print(f"⚠️ Erreur pour l'année {year} : {e}")
 
-from_date = "2008-01-01T00:00:00Z"
-to_date = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-
-data = graphql_request(repo_query, {
-    "login": USERNAME,
-    "from": from_date,
-    "to": to_date,
-})
-
-repos = []
-for entry in data["user"]["contributionsCollection"]["commitContributionsByRepository"]:
-    repo = entry["repository"]
-    repos.append(f"{repo['owner']['login']}/{repo['name']}")
-
-print(f"📦 {len(repos)} dépôt(s) trouvé(s) à analyser.")
+print(f"📦 {len(repo_set)} dépôt(s) trouvé(s) à analyser.")
 
 # --- 2. Pour chaque dépôt, récupérer tous vos commits et additionner les lignes ---
 total_lines = 0
@@ -83,7 +89,10 @@ query($owner: String!, $repo: String!, $from: GitTimestamp!, $to: GitTimestamp!,
 }
 """
 
-for repo_full in repos:
+from_date_all = "2008-01-01T00:00:00Z"
+to_date_all = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+for repo_full in repo_set:
     owner, repo_name = repo_full.split("/")
     print(f"🔍 Analyse de {repo_full}...")
     
@@ -95,8 +104,8 @@ for repo_full in repos:
         variables = {
             "owner": owner,
             "repo": repo_name,
-            "from": from_date,
-            "to": to_date,
+            "from": from_date_all,
+            "to": to_date_all,
             "cursor": cursor,
         }
         try:
