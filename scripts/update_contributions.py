@@ -1,16 +1,22 @@
 import os
 import requests
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 USERNAME = os.environ["GITHUB_USERNAME"]
 TOKEN = os.environ["GITHUB_TOKEN"]
 
-query = """
+QUERY = """
 query($login: String!, $from: DateTime!, $to: DateTime!) {
   user(login: $login) {
     contributionsCollection(from: $from, to: $to) {
       contributionCalendar {
         totalContributions
+        weeks {
+          contributionDays {
+            date
+            contributionCount
+          }
+        }
       }
     }
   }
@@ -18,11 +24,15 @@ query($login: String!, $from: DateTime!, $to: DateTime!) {
 """
 
 now = datetime.now(timezone.utc)
-one_year_ago = now - timedelta(days=365)
+
+# GitHub's "last year" calendar starts 1 year ago
+# but we use the calendar dates themselves rather than
+# simply summing API contribution types.
+from_date = now.replace(year=now.year - 1)
 
 variables = {
     "login": USERNAME,
-    "from": one_year_ago.isoformat(),
+    "from": from_date.isoformat(),
     "to": now.isoformat(),
 }
 
@@ -33,19 +43,21 @@ response = requests.post(
         "Content-Type": "application/json",
     },
     json={
-        "query": query,
+        "query": QUERY,
         "variables": variables,
     },
 )
 
+response.raise_for_status()
 data = response.json()
 
 if "errors" in data:
+    print("GitHub GraphQL error:")
     print(data["errors"])
     raise SystemExit(1)
 
-total = data["data"]["user"]["contributionsCollection"][
-    "contributionCalendar"
-]["totalContributions"]
+calendar = data["data"]["user"]["contributionsCollection"]["contributionCalendar"]
+
+total = calendar["totalContributions"]
 
 print(f"All-time contributions: {total}")
