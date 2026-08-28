@@ -43,7 +43,6 @@ for year in range(2008, current_year + 1):
     )
 
     response.raise_for_status()
-
     data = response.json()
 
     if "errors" in data:
@@ -55,6 +54,7 @@ for year in range(2008, current_year + 1):
 
 print(f"All-time contributions: {total}")
 
+# Génère les GIFs correspondant à chaque chiffre
 digits = str(total)
 
 images = "\n".join(
@@ -71,8 +71,11 @@ content = f"""<!-- CONTRIBUTIONS:START -->
 with open("README.md", "r", encoding="utf-8") as f:
     readme = f.read()
 
+# Remplace uniquement le bloc entre les marqueurs
+pattern = r"<!-- CONTRIBUTIONS:START -->.*?<!-- CONTRIBUTIONS:END -->"
+
 readme = re.sub(
-    r"<!-- CONTRIBUTIONS:START -->.*?<!-- CONTRIBUTIONS:END -->",
+    pattern,
     content,
     readme,
     flags=re.DOTALL,
