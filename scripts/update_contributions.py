@@ -1,6 +1,7 @@
 import os
-import requests
 import re
+import requests
+from datetime import datetime
 
 USERNAME = os.environ["GITHUB_USERNAME"]
 TOKEN = os.environ["GITHUB_TOKEN"]
@@ -23,41 +24,37 @@ headers = {
 }
 
 total = 0
+current_year = datetime.now().year
 
-for year in range(2010, 2027):
+for year in range(2008, current_year + 1):
     variables = {
         "login": USERNAME,
         "from": f"{year}-01-01T00:00:00Z",
-        "to": f"{year + 1}-01-01T00:00:00Z",
+        "to": f"{year}-12-31T23:59:59Z",
     }
 
     response = requests.post(
         "https://api.github.com/graphql",
-        headers=headers,
         json={
             "query": QUERY,
             "variables": variables,
         },
+        headers=headers,
     )
+
+    response.raise_for_status()
 
     data = response.json()
 
     if "errors" in data:
-        print(f"{year}: ERROR")
-        print(data["errors"])
-        continue
+        raise RuntimeError(data["errors"])
 
-    count = data["data"]["user"]["contributionsCollection"][
+    total += data["data"]["user"]["contributionsCollection"][
         "contributionCalendar"
     ]["totalContributions"]
 
-    print(f"{year}: {count}")
-    total += count
+print(f"All-time contributions: {total}")
 
-print("----------------")
-print(f"TOTAL: {total}")
-
-# Génère les GIFs correspondant à chaque chiffre
 digits = str(total)
 
 images = "\n".join(
