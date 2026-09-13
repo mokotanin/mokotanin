@@ -8,6 +8,6 @@
 <img src="./counter-images/3.gif" alt="3">
 <img src="./counter-images/7.gif" alt="7">
 <img src="./counter-images/7.gif" alt="7">
-<img src="./counter-images/7.gif" alt="7">
+<img src="./counter-images/8.gif" alt="8">
 </p>
 <!-- CONTRIBUTIONS:END -->
