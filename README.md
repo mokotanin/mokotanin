@@ -1,4 +1,4 @@
-!["ok"]([./assets/mokotanin.png](https://github.com/mokotanin/mokotanin/blob/7d5fdf0c17588b4f8ff5a68114c92ffd6fbbdd8a/assets/mokotanin.png))
+!["ok"](https://github.com/mokotanin/mokotanin/blob/7d5fdf0c17588b4f8ff5a68114c92ffd6fbbdd8a/assets/mokotanin.png)
 
 <!-- CONTRIBUTIONS:START -->
 <p align="center">
