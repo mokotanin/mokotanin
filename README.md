@@ -6,8 +6,8 @@
 <img src="./counter-images/6.gif" alt="6">
 <img src="./counter-images/3.gif" alt="3">
 <img src="./counter-images/4.gif" alt="4">
-<img src="./counter-images/5.gif" alt="5">
-<img src="./counter-images/5.gif" alt="5">
-<img src="./counter-images/4.gif" alt="4">
+<img src="./counter-images/7.gif" alt="7">
+<img src="./counter-images/8.gif" alt="8">
+<img src="./counter-images/3.gif" alt="3">
 </p>
 <!-- CONTRIBUTIONS:END -->
