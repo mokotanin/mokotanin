@@ -11,3 +11,8 @@
 <img src="./counter-images/6.gif" alt="6">
 </p>
 <!-- CONTRIBUTIONS:END -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="github-snake-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="github-snake.svg" />
+  <img alt="github-snake" src="github-snake.svg" />
+</picture>
