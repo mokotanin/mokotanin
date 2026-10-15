@@ -5,10 +5,10 @@
 <img src="./counter-images/1.gif" alt="1">
 <img src="./counter-images/1.gif" alt="1">
 <img src="./counter-images/2.gif" alt="2">
-<img src="./counter-images/3.gif" alt="3">
-<img src="./counter-images/4.gif" alt="4">
-<img src="./counter-images/1.gif" alt="1">
+<img src="./counter-images/5.gif" alt="5">
+<img src="./counter-images/8.gif" alt="8">
 <img src="./counter-images/2.gif" alt="2">
+<img src="./counter-images/4.gif" alt="4">
 </p>
 <!-- CONTRIBUTIONS:END -->
 
