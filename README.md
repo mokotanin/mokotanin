@@ -17,3 +17,6 @@
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/mokotanin/mokotanin/output/github-snake.svg" />
   <img alt="github-snake" src="https://raw.githubusercontent.com/mokotanin/mokotanin/output/github-snake.svg" />
 </picture>
+<p align="center">
+<img src="https://github.githubassets.com/assets/mona-hifive-loop-once-454eda737f401d20.gif" alt="cats high five">
+</p>
